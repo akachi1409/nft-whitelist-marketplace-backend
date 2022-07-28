@@ -8,7 +8,7 @@ const path = require('path');
 // Constants
 const PUBLIC_DIR = path.join(__dirname, `../build/static`);
 const BUILD_DIR = path.join(__dirname, `../build`);
-const router = require('./routes/router');
+const router = require('./src/routes/router');
 
 // Stores custom environmental variables
 require('dotenv').config({
@@ -32,6 +32,10 @@ mongoose.connect(`mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO
 // Middleware
 app.use('/static', express.static(PUBLIC_DIR)); // Serves static files
 app.use('/client', express.static(BUILD_DIR)); // Serves static files
+
+const fileUpload = require("express-fileupload");
+app.use(fileUpload());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 app.use(express.json()); // Parses incoming JSON requests
 app.use(express.urlencoded({
