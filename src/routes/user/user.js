@@ -6,8 +6,9 @@ const Project = require("../../models/Project");
 // const path = require("path");
 router.get("/project/:project", async (req, res) =>{
   const project = req.params.project;
+  console.log("====", project);
   try{
-    const p = await Project.findOne({project: project});
+    const p = await Project.findOne({projectName: project});
     console.log("p", p);
     res.json({ success: true, number: p.listedWl, limit: p.wlLimit})
   }catch (err) {
@@ -16,9 +17,10 @@ router.get("/project/:project", async (req, res) =>{
     res.status(500).json({ success: false, error: "Server error" });
   }
 })
-router.get("/address/list", async (req, res) => {
+router.get("/address/list/:project", async (req, res) => {
+  const project = req.params.project;
   try {
-    User.find({}, (err, users) => {
+    User.find({project:project}, (err, users) => {
       if (err) {
         res.status(500).json({ success: false, error: "Server error" });
       }
