@@ -20,7 +20,7 @@ const cors = require('cors'); // Enables CORS
 // Database integration
 const mongoose = require('mongoose');
 // Connects to database
-mongoose.connect(`mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASS}@cluster0.qodzo.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`)
+mongoose.connect(`mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASS}@cluster0.on75wsr.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`)
     .then( () => {
       console.log('Connected to database ');
     })
