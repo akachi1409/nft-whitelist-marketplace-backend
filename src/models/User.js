@@ -11,12 +11,13 @@ const orderHistory = new mongoose.Schema({
     orderDate: {type:Date, required: true},
     etherCost: {type:Number, required: true},
     clankCost: {type:Number, required: true},
+    orderNumber: {type:Number, required: true},
     whitelist: [whitelistHistory]
 })
 const userSchema = new mongoose.Schema({
     user_id: {type: Number, required: true},
     address: {type: String, required: true},
-    // project: {type: String, required: true},
+    lastUpdate: {type:Date, required: true},
     orders: [orderHistory]
 })
 

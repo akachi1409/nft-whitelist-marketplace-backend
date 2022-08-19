@@ -63,7 +63,15 @@ router.post("/address/insertCart", async (req, res) => {
   const etherCost = req.body.etherCost;
   const clankCost = req.body.clankCost;
   const userNum = await User.countDocuments();
+ 
   console.log("---------------")
+  let lastNumber;
+  if (userNum == 0){
+    lastNumber = 0;
+  }else{
+    const lastUser = await User.find().sort({lastUpdate: "asc"}).skip(userNum - 1);
+    lastNumber =lastUser[0].orders[lastUser[0].orders.length-1].orderNumber
+  }
   try{
     const user = await User.findOne({ address: address });
     if (user){
@@ -83,7 +91,8 @@ router.post("/address/insertCart", async (req, res) => {
         orderDate: new Date(),
         etherCost: etherCost,
         clankCost: clankCost,
-        whitelist: whitelist
+        whitelist: whitelist,
+        orderNumber: lastNumber + 1,
       }
       orders.push(newOrder);
       console.log("Order:------",orders)
@@ -105,7 +114,8 @@ router.post("/address/insertCart", async (req, res) => {
         orderDate: new Date(),
         etherCost: etherCost,
         clankCost: clankCost,
-        whitelist: whitelist
+        whitelist: whitelist,
+        orderNumber: lastNumber + 1,
       }
       const newUser = new User({
         user_id: userNum + 1,
@@ -129,6 +139,14 @@ router.post("/address/insert", async (req, res) => {
   const clankCost = req.body.clankCost;
 
   const userNum = await User.countDocuments();
+  
+  let lastNumber;
+  if (userNum == 0){
+    lastNumber = 0;
+  }else{
+    const lastUser = await User.find().sort({lastUpdate: "asc"}).skip(userNum - 1);
+    lastNumber =lastUser[0].orders[lastUser[0].orders.length-1].orderNumber
+  }
   try {
     const user = await User.findOne({ address: address });
     if (user){
@@ -144,8 +162,10 @@ router.post("/address/insert", async (req, res) => {
         orderDate: new Date(),
         etherCost: etherCost,
         clankCost: clankCost,
+        orderNumber: lastNumber + 1,
         whitelist: [newWL]
       }
+      user.lastUpdate = new Date();
       orders.push(newOrder);
       user.save();
     }
@@ -161,11 +181,13 @@ router.post("/address/insert", async (req, res) => {
         orderDate: new Date(),
         etherCost: etherCost,
         clankCost: clankCost,
+        orderNumber: lastNumber + 1,
         whitelist: [newWL]
       }
       const newUser = new User({
         user_id: userNum + 1,
         address: address,
+        lastUpdate: new Date(),
         orders: [newOrder]
       });
       newUser.save();

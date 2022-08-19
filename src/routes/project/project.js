@@ -2,6 +2,7 @@ const { Router } = require("express");
 const fs = require("fs");
 const router = new Router({ mergeParams: true });
 const Project = require("../../models/Project");
+const User = require("../../models/User");
 
 router.get("/list", async (req, res) => {
   try {
@@ -9,7 +10,7 @@ router.get("/list", async (req, res) => {
       if (err) {
         res.status(500).json({ success: false, error: "Server error" });
       }
-      console.log("users", projects);
+      // console.log("users", projects);
       res.json({ success: true, projects: projects });
     });
   } catch (err) {
@@ -67,4 +68,25 @@ router.post("/insert", async (req, res) => {
     return res.status(500).json({ success: false, error: "Server error" });
   }
 });
+
+router.get("/list/project", async (req, res) => {
+  try {
+    const orders = [];
+    User.find({}, (err, users)=>{
+      if (err) {
+        res.status(500).json({ success: false, error: "Server error" });
+      }
+      users.map((user, index)=>{
+        user.orders.map((order) =>{
+          orders.push(order);
+        })
+      })
+      res.json({ success : true, orders: orders})
+    })
+  } catch (err) {
+    console.log("Error getting an asset from user assets");
+    console.log(err);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+})
 module.exports = router;
