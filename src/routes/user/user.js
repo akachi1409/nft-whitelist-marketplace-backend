@@ -56,7 +56,69 @@ router.get("/address/:address/:project", async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 });
-
+router.post("/address/insertCart", async (req, res) => {
+  const address = req.body.address;
+  const discordID = req.body.discordID;
+  const cartInfo = req.body.cartInfo;
+  const etherCost = req.body.etherCost;
+  const clankCost = req.body.clankCost;
+  const userNum = await User.countDocuments();
+  console.log("---------------")
+  try{
+    const user = await User.findOne({ address: address });
+    if (user){
+      const orders = user.orders;
+      const whitelist = []
+      cartInfo.map((item, index)=> {
+        const newWL = {
+          whitelistPicture: item.img,
+          whitelistName: item.projectName,
+          quantity: item.quantity
+        }
+        whitelist.push(newWL);
+      })
+      const newOrder = {
+        walletAddress: address,
+        discordID: discordID,
+        orderDate: new Date(),
+        etherCost: etherCost,
+        clankCost: clankCost,
+        whitelist: whitelist
+      }
+      orders.push(newOrder);
+      console.log("Order:------",orders)
+      user.save();
+    }
+    else{
+      const whitelist = []
+      cartInfo.map((item, index)=> {
+        const newWL = {
+          whitelistPicture: item.img,
+          whitelistName: item.projectName,
+          quantity: item.quantity
+        }
+        whitelist.push(newWL);
+      })
+      const newOrder = {
+        walletAddress: address,
+        discordID: discordID,
+        orderDate: new Date(),
+        etherCost: etherCost,
+        clankCost: clankCost,
+        whitelist: whitelist
+      }
+      const newUser = new User({
+        user_id: userNum + 1,
+        address: address,
+        orders: [newOrder]
+      });
+      newUser.save();
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+})
 router.post("/address/insert", async (req, res) => {
   const address = req.body.address;
   const project = req.body.project;
@@ -104,7 +166,6 @@ router.post("/address/insert", async (req, res) => {
       const newUser = new User({
         user_id: userNum + 1,
         address: address,
-        project: project,
         orders: [newOrder]
       });
       newUser.save();

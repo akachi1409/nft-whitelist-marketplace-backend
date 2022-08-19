@@ -16,7 +16,7 @@ const orderHistory = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
     user_id: {type: Number, required: true},
     address: {type: String, required: true},
-    project: {type: String, required: true},
+    // project: {type: String, required: true},
     orders: [orderHistory]
 })
 

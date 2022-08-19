@@ -25,7 +25,7 @@ router.post("/insert", async (req, res) => {
   const fileName = req.body.fileName;
   const project = req.body.name;
   const limit = req.body.limit;
-  const address = req.body.address;
+  const description = req.body.description;
   const etherPrice = req.body.etherPrice;
   const clankPrice = req.body.clankPrice;
   const wlProject = await Project.find({
@@ -52,7 +52,7 @@ router.post("/insert", async (req, res) => {
   const newProject = new Project({
     projectName: project,
     wlLimit: limit,
-    adminAddress: address,
+    description: description,
     listedWl: 0,
     etherPrice: etherPrice,
     clankPrice: clankPrice,
