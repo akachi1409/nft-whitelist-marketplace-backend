@@ -63,7 +63,6 @@ router.post("/address/insertCart", async (req, res) => {
   const etherCost = req.body.etherCost;
   const clankCost = req.body.clankCost;
   const userNum = await User.countDocuments();
- 
   console.log("---------------")
   let lastNumber;
   if (userNum == 0){
@@ -81,7 +80,9 @@ router.post("/address/insertCart", async (req, res) => {
         const newWL = {
           whitelistPicture: item.img,
           whitelistName: item.projectName,
-          quantity: item.quantity
+          quantity: item.quantity,
+          etherCost: item.totalEther,
+          clankCost: item.totalClank,
         }
         whitelist.push(newWL);
       })
@@ -89,8 +90,8 @@ router.post("/address/insertCart", async (req, res) => {
         walletAddress: address,
         discordID: discordID,
         orderDate: new Date(),
-        etherCost: etherCost,
-        clankCost: clankCost,
+        totalEther: etherCost,
+        totalClank: clankCost,
         whitelist: whitelist,
         orderNumber: lastNumber + 1,
       }
@@ -104,7 +105,9 @@ router.post("/address/insertCart", async (req, res) => {
         const newWL = {
           whitelistPicture: item.img,
           whitelistName: item.projectName,
-          quantity: item.quantity
+          quantity: item.quantity,
+          etherCost: item.totalEther,
+          clankCost: item.totalClank,
         }
         whitelist.push(newWL);
       })
@@ -147,6 +150,7 @@ router.post("/address/insert", async (req, res) => {
     const lastUser = await User.find().sort({lastUpdate: "asc"}).skip(userNum - 1);
     lastNumber =lastUser[0].orders[lastUser[0].orders.length-1].orderNumber
   }
+  console.log("-------------")
   try {
     const user = await User.findOne({ address: address });
     if (user){
@@ -154,17 +158,21 @@ router.post("/address/insert", async (req, res) => {
       const newWL = {
         whitelistPicture: image,
         whitelistName: project,
-        quantity: quantity
+        quantity: quantity,
+        etherCost: etherCost,
+        clankCost: clankCost,
       }
+      console.log(newWL)
       const newOrder = {
         walletAddress: address,
         discordID: discordID,
         orderDate: new Date(),
-        etherCost: etherCost,
-        clankCost: clankCost,
+        totalEther: etherCost,
+        totalClank: clankCost,
         orderNumber: lastNumber + 1,
         whitelist: [newWL]
       }
+      console.log(newOrder)
       user.lastUpdate = new Date();
       orders.push(newOrder);
       user.save();
@@ -173,14 +181,16 @@ router.post("/address/insert", async (req, res) => {
       const newWL = {
         whitelistPicture: image,
         whitelistName: project,
-        quantity: quantity
+        quantity: quantity,
+        etherCost: etherCost,
+        clankCost: clankCost,
       }
       const newOrder = {
         walletAddress: address,
         discordID: discordID,
         orderDate: new Date(),
-        etherCost: etherCost,
-        clankCost: clankCost,
+        totalEther: etherCost,
+        totalClank: clankCost,
         orderNumber: lastNumber + 1,
         whitelist: [newWL]
       }
