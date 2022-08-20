@@ -29,12 +29,13 @@ router.post("/insert", async (req, res) => {
   const description = req.body.description;
   const etherPrice = req.body.etherPrice;
   const clankPrice = req.body.clankPrice;
+  const endTime= req.body.endTime;
   const wlProject = await Project.find({
     projectName: project,
   });
-  console.log(wlProject.length);
+  console.log(wlProject.length, endTime);
   if (wlProject.length > 0) {
-    console.log("=------------------");
+    console.log("=------------------", endTime);
     res.status(500).json({ success: false, error: "Project already exists." });
     return;
   }
@@ -51,13 +52,14 @@ router.post("/insert", async (req, res) => {
     }
   });
   const newProject = new Project({
+    endTime: endTime,
     projectName: project,
     wlLimit: limit,
     description: description,
     listedWl: 0,
     etherPrice: etherPrice,
     clankPrice: clankPrice,
-    imageName: project+ "." + file.name.split(".")[1]
+    imageName: project+ "." + file.name.split(".")[1],
   });
   console.log(newProject);
   try {
