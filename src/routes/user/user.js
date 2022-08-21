@@ -153,7 +153,7 @@ router.post("/address/insert", async (req, res) => {
   const clankCost = req.body.clankCost;
 
   const userNum = await User.countDocuments();
-  
+  console.log("===========", userNum);
   let lastNumber;
   if (userNum == 0){
     lastNumber = 0;

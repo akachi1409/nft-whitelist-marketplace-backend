@@ -4,7 +4,14 @@
 const express = require('express');
 const app = express();
 const path = require('path');
+const https = require('https');
+const fs = require('fs');
 
+const options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
+var server = https.createServer(options, app);
 // Constants
 const PUBLIC_DIR = path.join(__dirname, `../build/static`);
 const BUILD_DIR = path.join(__dirname, `../build`);
@@ -48,5 +55,10 @@ app.use('/', router);
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(BUILD_DIR, 'index.html'));
   });
-  
+
+  var server = https.createServer(options, app);
+  const PORT = process.env.BACK_END_PORT;
+server.listen(PORT, () => {
+  console.log("server starting on port : " + PORT)
+});
   module.exports = app;
