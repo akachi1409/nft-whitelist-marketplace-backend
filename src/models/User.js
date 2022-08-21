@@ -9,7 +9,7 @@ const whitelistHistory = new mongoose.Schema({
 })
 const orderHistory = new mongoose.Schema({
     walletAddress: {type:String, required: true},
-    discordID: {type:String, required: true},
+    discordID: {type:String, required: false},
     orderDate: {type:Date, required: true},
     totalEther: {type:Number, required: true},
     totalClank: {type:Number, required: true},
