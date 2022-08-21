@@ -101,7 +101,7 @@ router.post("/address/insertCart", async (req, res) => {
     }
     else{
       const whitelist = []
-      cartInfo.map((item, index)=> {
+      cartInfo.map(async (item, index)=> {
         const newWL = {
           whitelistPicture: item.img,
           whitelistName: item.projectName,
@@ -110,6 +110,16 @@ router.post("/address/insertCart", async (req, res) => {
           clankCost: item.totalClank,
         }
         whitelist.push(newWL);
+        const wlProject =await Project.findOne({
+          projectName: item.projectName,
+        });
+        console.log(wlProject)
+        if (wlProject) {
+          wlProject.listedWl+= item.quantity;
+          await wlProject.save();
+        } else {
+          res.status(500).json({ success: false, error: "Project not found." });
+        }
       })
       const newOrder = {
         walletAddress: address,
@@ -127,6 +137,7 @@ router.post("/address/insertCart", async (req, res) => {
       });
       newUser.save();
     }
+
   } catch (err) {
     console.log(err);
     res.status(500).json({ success: false, error: "Server error" });
