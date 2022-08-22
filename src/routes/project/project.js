@@ -5,6 +5,7 @@ const Project = require("../../models/Project");
 const User = require("../../models/User");
 
 router.get("/list", async (req, res) => {
+  console.log("asdfd")
   try {
     Project.find({}, (err, projects) => {
       if (err) {
