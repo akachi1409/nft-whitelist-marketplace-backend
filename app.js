@@ -56,9 +56,9 @@ app.get('*', (req, res) => {
     res.sendFile(path.resolve(BUILD_DIR, 'index.html'));
   });
 
-  var server = https.createServer(options, app);
-  const PORT = process.env.BACK_END_PORT;
-server.listen(PORT, () => {
-  console.log("server starting on port : " + PORT)
-});
+//   var server = https.createServer(options, app);
+//   const PORT = process.env.BACK_END_PORT;
+// server.listen(PORT, () => {
+//   console.log("server starting on port : " + PORT)
+// });
   module.exports = app;
