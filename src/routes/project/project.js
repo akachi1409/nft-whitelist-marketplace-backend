@@ -72,7 +72,7 @@ router.post("/insert", async (req, res) => {
   }
 });
 
-router.get("/list/project", async (req, res) => {
+router.get("/project", async (req, res) => {
   try {
     const orders = [];
     User.find({}, (err, users)=>{
@@ -87,6 +87,18 @@ router.get("/list/project", async (req, res) => {
       res.json({ success : true, orders: orders})
     })
   } catch (err) {
+    console.log("Error getting an asset from user assets");
+    console.log(err);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+})
+
+router.delete("/delete/:projectName", async (req, res) => {
+  try{
+    const projectName = req.params.projectName;
+    await Project.deleteOne({projectName: projectName} )
+    res.json({ success : true})
+  }catch (err) {
     console.log("Error getting an asset from user assets");
     console.log(err);
     res.status(500).json({ success: false, error: "Server error" });
