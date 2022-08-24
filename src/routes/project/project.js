@@ -31,7 +31,6 @@ router.get("/list", async (req, res) => {
 router.put("/update", async(req, res) => {
   try {
     const formData = req.files;
-    console.log("formData", formData);
     const original = req.body.original;
     const fileName = req.body.fileName;
     const project = req.body.name;
@@ -66,7 +65,7 @@ router.put("/update", async(req, res) => {
       wlProject[0].endTime = endTime;
       wlProject[0].imageName = uploadedImage.Location
       wlProject[0].save();
-      return;
+      return res.json({ success: true, newProject: wlProject[0] });
     }
     else{
       res.status(500).json({ success: false, error: "Project not exists." });
@@ -151,7 +150,7 @@ router.get("/:projectID", async (req, res)=>{
   try{
     Project.findOne({_id: projectID}, (err, project)=>{
       if (err) {
-        res.status(500).json({ success: false, error:err})
+        return res.status(500).json({ success: false, error:err})
       }
       res.json({success: true, project: project})
     })
