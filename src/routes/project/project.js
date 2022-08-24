@@ -101,6 +101,7 @@ router.post("/insert", async (req, res) => {
     }
     var file = formData[fileName]
     var base64data = Buffer.from(JSON.stringify(file), 'binary');
+    console.log(process.env.AWS_S3_BUCKET_NAME)
     const uploadedImage =  await s3.upload({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: fileName,
