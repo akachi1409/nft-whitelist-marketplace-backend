@@ -4,6 +4,8 @@ const AWS = require("aws-sdk");
 const router = new Router({ mergeParams: true });
 const Project = require("../../models/Project");
 const User = require("../../models/User");
+/** Require multer */
+const multer = require('multer');
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
@@ -79,7 +81,6 @@ router.post("/insert", async (req, res) => {
     // console.log("req", req);
   try {
     const formData = req.files;
-    console.log("formData", formData);
     const fileName = req.body.fileName;
     const project = req.body.name;
     const limit = req.body.limit;
@@ -95,17 +96,13 @@ router.post("/insert", async (req, res) => {
       res.status(500).json({ success: false, error: "Project already exists." });
       return;
     }
-    const dir = "./uploads";
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
-    }
+    
     var file = formData[fileName]
-    var base64data = Buffer.from(JSON.stringify(file), 'binary');
     console.log(process.env.AWS_S3_BUCKET_NAME)
     const uploadedImage =  await s3.upload({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: fileName,
-      Body: base64data,
+      Key: project.replace(/ /g,"_"),
+      Body: file.data,
     }).promise();
     const newProject = new Project({
       endTime: endTime,
@@ -169,13 +166,9 @@ router.delete("/delete/:projectID", async (req, res) => {
   const projectID = req.params.projectID;
   try{
     const project = await Project.findOne({_id: projectID})
-    
-    // const dir = "./uploads";
-    // const filePath = dir + "/" + project.imageName;
-    // fs.unlinkSync(filePath);
     s3.deleteObject({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: project.fileName
+      Key: project.projectName.replace(/ /g,"_")
     }, (err, data) => {
       console.error(err);
       console.log(data);
