@@ -145,10 +145,12 @@ router.get("/project", async (req, res) => {
 
 router.get("/:projectID", async (req, res)=>{
   const projectID = req.params.projectID;
-  console.log("projectName", projectID);
+  console.log("projectID", projectID);
   try{
     Project.findOne({_id: projectID}, (err, project)=>{
-      if (err) res.status(500).json({ success: false, error:err})
+      if (err) {
+        res.status(500).json({ success: false, error:err})
+      }
       res.json({success: true, project: project})
     })
   }catch (err) {
