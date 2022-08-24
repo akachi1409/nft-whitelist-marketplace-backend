@@ -100,11 +100,10 @@ router.post("/insert", async (req, res) => {
       fs.mkdirSync(dir);
     }
     var file = formData[fileName]
-    const blob = fs.readFileSync(formData[fileName].path)
     const uploadedImage =  await s3.upload({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: file,
-      Body: blob,
+      Key: fileName,
+      Body: file,
     }).promise();
     // uploadPath = dir + "/" + project.replace(/ /g,"_") + "." + file.name.split(".")[1];
     // file.mv(uploadPath, function (err) {
