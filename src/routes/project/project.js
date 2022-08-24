@@ -176,6 +176,9 @@ router.delete("/delete/:projectID", async (req, res) => {
     s3.deleteObject({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: project.fileName
+    }, (err, data) => {
+      console.error(err);
+      console.log(data);
     })
     await Project.deleteOne({_id: projectID} )
     res.json({ success : true})
