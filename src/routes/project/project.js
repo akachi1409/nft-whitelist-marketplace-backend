@@ -95,7 +95,7 @@ router.post("/insert", async (req, res) => {
       fs.mkdirSync(dir);
     }
     var file = formData[fileName]
-    uploadPath = dir + "/" + project + "." + file.name.split(".")[1];
+    uploadPath = dir + "/" + project.replace(/ /g,"_") + "." + file.name.split(".")[1];
     file.mv(uploadPath, function (err) {
       if (err) {
         console.log("err:", err);
