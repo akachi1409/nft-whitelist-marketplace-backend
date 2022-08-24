@@ -44,26 +44,27 @@ router.put("/update", async(req, res) => {
       _id: original,
     });
     if (wlProject.length ==1) {
-      const dir = "./uploads";
-      const filePath = dir + "/" +  wlProject[0].imageName;
-      fs.unlinkSync(filePath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-      }
+      
       var file = formData[fileName]
-      uploadPath = dir + "/" + project + "." + file.name.split(".")[1];
-      file.mv(uploadPath, function (err) {
-        if (err) {
-          console.log("err:", err);
-          return res.status(500).send(err);
-        }
-      });
+      s3.deleteObject({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: wlProject[0].projectName.replace(/ /g,"_")
+      }, (err, data) => {
+        console.error(err);
+        console.log(data);
+      })
+      const uploadedImage =  await s3.upload({
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: project.replace(/ /g,"_"),
+        Body: file.data,
+      }).promise();
       wlProject[0].description = description;
       wlProject[0].projectName = project;
       wlProject[0].wlLimit = limit;
       wlProject[0].etherPrice = etherPrice;
       wlProject[0].clankPrice = clankPrice;
       wlProject[0].endTime = endTime;
+      wlProject[0].imageName = uploadedImage.Location
       wlProject[0].save();
       return;
     }
@@ -96,7 +97,6 @@ router.post("/insert", async (req, res) => {
       res.status(500).json({ success: false, error: "Project already exists." });
       return;
     }
-    
     var file = formData[fileName]
     console.log(process.env.AWS_S3_BUCKET_NAME)
     const uploadedImage =  await s3.upload({
@@ -116,7 +116,6 @@ router.post("/insert", async (req, res) => {
       fileName: fileName,
     });
     console.log(newProject);
-  
     await newProject.save();
     return res.json({ success: true, newProject: newProject });
   } catch (err) {
