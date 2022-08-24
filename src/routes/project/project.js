@@ -145,9 +145,10 @@ router.get("/project", async (req, res) => {
 
 router.get("/:projectName", async (req, res)=>{
   const projectName = req.params.projectName;
+  console.log("projectName", projectName);
   try{
     Project.findOne({projectName: projectName}, (err, project)=>{
-      if (err) res.status(500).json({ success: false, error:"Server Error"})
+      if (err) res.status(500).json({ success: false, error:err})
       res.json({success: true, project: project})
     })
   }catch (err) {
