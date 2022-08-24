@@ -107,13 +107,6 @@ router.post("/insert", async (req, res) => {
       Key: fileName,
       Body: base64data,
     }).promise();
-    // uploadPath = dir + "/" + project.replace(/ /g,"_") + "." + file.name.split(".")[1];
-    // file.mv(uploadPath, function (err) {
-    //   if (err) {
-    //     console.log("err:", err);
-    //     return res.status(500).send(err);
-    //   }
-    // });
     const newProject = new Project({
       endTime: endTime,
       projectName: project,
@@ -123,6 +116,7 @@ router.post("/insert", async (req, res) => {
       etherPrice: etherPrice,
       clankPrice: clankPrice,
       imageName: uploadedImage.Location,
+      fileName: fileName,
     });
     console.log(newProject);
   
@@ -175,10 +169,15 @@ router.delete("/delete/:projectID", async (req, res) => {
   const projectID = req.params.projectID;
   try{
     const project = await Project.findOne({_id: projectID})
+    
+    // const dir = "./uploads";
+    // const filePath = dir + "/" + project.imageName;
+    // fs.unlinkSync(filePath);
+    s3.deleteObject({
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: project.fileName
+    })
     await Project.deleteOne({_id: projectID} )
-    const dir = "./uploads";
-    const filePath = dir + "/" + project.imageName;
-    fs.unlinkSync(filePath);
     res.json({ success : true})
   }catch (err) {
     console.log("Error deleting in project.");

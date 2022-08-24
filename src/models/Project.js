@@ -10,6 +10,7 @@ const projectSchema = new mongoose.Schema({
     imageName: {type:String, require:true},
     description: {type:String, required: true},
     endTime: {type:Date},
+    fileName: {type:String, required: true},
 })
 
 const Project = mongoose.model('Project', projectSchema);
