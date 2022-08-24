@@ -34,7 +34,7 @@ router.put("/update", async(req, res) => {
     const clankPrice = req.body.clankPrice;
     const endTime= req.body.endTime;
     const wlProject = await Project.find({
-      projectName: original,
+      _id: original,
     });
     if (wlProject.length ==1) {
       const dir = "./uploads";
@@ -143,11 +143,11 @@ router.get("/project", async (req, res) => {
   }
 })
 
-router.get("/:projectName", async (req, res)=>{
-  const projectName = req.params.projectName;
-  console.log("projectName", projectName);
+router.get("/:projectID", async (req, res)=>{
+  const projectID = req.params.projectID;
+  console.log("projectName", projectID);
   try{
-    Project.findOne({projectName: projectName}, (err, project)=>{
+    Project.findOne({_id: projectID}, (err, project)=>{
       if (err) res.status(500).json({ success: false, error:err})
       res.json({success: true, project: project})
     })
@@ -157,11 +157,11 @@ router.get("/:projectName", async (req, res)=>{
     res.status(500).json({ success: false, error: "Server error" });
   }
 })
-router.delete("/delete/:projectName", async (req, res) => {
-  const projectName = req.params.projectName;
+router.delete("/delete/:projectID", async (req, res) => {
+  const projectID = req.params.projectID;
   try{
-    const project = await Project.findOne({projectName: projectName})
-    await Project.deleteOne({projectName: projectName} )
+    const project = await Project.findOne({_id: projectID})
+    await Project.deleteOne({_id: projectID} )
     const dir = "./uploads";
     const filePath = dir + "/" + project.imageName;
     fs.unlinkSync(filePath);
