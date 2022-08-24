@@ -100,7 +100,7 @@ router.post("/insert", async (req, res) => {
       fs.mkdirSync(dir);
     }
     var file = formData[fileName]
-    var base64data = new Buffer(file, 'binary');
+    var base64data = new Buffer(JSON.stringfy(file), 'binary');
     const uploadedImage =  await s3.upload({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: fileName,
