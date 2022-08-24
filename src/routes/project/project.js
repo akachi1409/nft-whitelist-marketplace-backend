@@ -1,11 +1,16 @@
 const { Router } = require("express");
 const fs = require("fs");
+const AWS = require("aws-sdk");
 const router = new Router({ mergeParams: true });
 const Project = require("../../models/Project");
 const User = require("../../models/User");
 
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
+})
+
 router.get("/list", async (req, res) => {
-  console.log("asdfd")
   try {
     Project.find({}, (err, projects) => {
       if (err) {
@@ -95,13 +100,18 @@ router.post("/insert", async (req, res) => {
       fs.mkdirSync(dir);
     }
     var file = formData[fileName]
-    uploadPath = dir + "/" + project.replace(/ /g,"_") + "." + file.name.split(".")[1];
-    file.mv(uploadPath, function (err) {
-      if (err) {
-        console.log("err:", err);
-        return res.status(500).send(err);
-      }
-    });
+    const uploadedImage =  await s3.upload({
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Key: file,
+      Body: blob,
+    }).promise();
+    // uploadPath = dir + "/" + project.replace(/ /g,"_") + "." + file.name.split(".")[1];
+    // file.mv(uploadPath, function (err) {
+    //   if (err) {
+    //     console.log("err:", err);
+    //     return res.status(500).send(err);
+    //   }
+    // });
     const newProject = new Project({
       endTime: endTime,
       projectName: project,
@@ -110,7 +120,7 @@ router.post("/insert", async (req, res) => {
       listedWl: 0,
       etherPrice: etherPrice,
       clankPrice: clankPrice,
-      imageName: project.replace(/ /g,"_")+ "." + file.name.split(".")[1],
+      imageName: uploadedImage.Location,
     });
     console.log(newProject);
   
