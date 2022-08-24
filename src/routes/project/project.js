@@ -169,7 +169,7 @@ router.delete("/delete/:projectID", async (req, res) => {
     fs.unlinkSync(filePath);
     res.json({ success : true})
   }catch (err) {
-    console.log("Error deleting in project with the name of " + projectName);
+    console.log("Error deleting in project.");
     console.log(err);
     res.status(500).json({ success: false, error: "Server error" });
   }
