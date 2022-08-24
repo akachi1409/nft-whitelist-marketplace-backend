@@ -20,50 +20,100 @@ router.get("/list", async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 });
+
+router.put("/update", async(req, res) => {
+  try {
+    const formData = req.files;
+    console.log("formData", formData);
+    const original = req.body.original;
+    const fileName = req.body.fileName;
+    const project = req.body.name;
+    const limit = req.body.limit;
+    const description = req.body.description;
+    const etherPrice = req.body.etherPrice;
+    const clankPrice = req.body.clankPrice;
+    const endTime= req.body.endTime;
+    const wlProject = await Project.find({
+      projectName: original,
+    });
+    if (wlProject.length ==1) {
+      const dir = "./uploads";
+      const filePath = dir + "/" +  wlProject[0].imageName;
+      fs.unlinkSync(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+      }
+      var file = formData[fileName]
+      uploadPath = dir + "/" + project + "." + file.name.split(".")[1];
+      file.mv(uploadPath, function (err) {
+        if (err) {
+          console.log("err:", err);
+          return res.status(500).send(err);
+        }
+      });
+      wlProject[0].description = description;
+      wlProject[0].projectName = project;
+      wlProject[0].wlLimit = limit;
+      wlProject[0].etherPrice = etherPrice;
+      wlProject[0].clankPrice = clankPrice;
+      wlProject[0].endTime = endTime;
+      wlProject[0].save();
+      return;
+    }
+    else{
+      res.status(500).json({ success: false, error: "Project not exists." });
+      return;
+    }
+  }catch (err) {
+    console.log(err);
+    return res.status(500).json({ success: false, error: "Server error" });
+  }
+
+})
 router.post("/insert", async (req, res) => {
     // console.log("req", req);
-  const formData = req.files;
-  console.log("formData", formData);
-  const fileName = req.body.fileName;
-  const project = req.body.name;
-  const limit = req.body.limit;
-  const description = req.body.description;
-  const etherPrice = req.body.etherPrice;
-  const clankPrice = req.body.clankPrice;
-  const endTime= req.body.endTime;
-  const wlProject = await Project.find({
-    projectName: project,
-  });
-  console.log(wlProject.length, endTime);
-  if (wlProject.length > 0) {
-    console.log("=------------------", endTime);
-    res.status(500).json({ success: false, error: "Project already exists." });
-    return;
-  }
-  const dir = "./uploads";
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
-  var file = formData[fileName]
-  uploadPath = dir + "/" + project + "." + file.name.split(".")[1];
-  file.mv(uploadPath, function (err) {
-    if (err) {
-      console.log("err:", err);
-      return res.status(500).send(err);
-    }
-  });
-  const newProject = new Project({
-    endTime: endTime,
-    projectName: project,
-    wlLimit: limit,
-    description: description,
-    listedWl: 0,
-    etherPrice: etherPrice,
-    clankPrice: clankPrice,
-    imageName: project+ "." + file.name.split(".")[1],
-  });
-  console.log(newProject);
   try {
+    const formData = req.files;
+    console.log("formData", formData);
+    const fileName = req.body.fileName;
+    const project = req.body.name;
+    const limit = req.body.limit;
+    const description = req.body.description;
+    const etherPrice = req.body.etherPrice;
+    const clankPrice = req.body.clankPrice;
+    const endTime= req.body.endTime;
+    const wlProject = await Project.find({
+      projectName: project,
+    });
+    if (wlProject.length > 0) {
+      console.log("=------------------", endTime);
+      res.status(500).json({ success: false, error: "Project already exists." });
+      return;
+    }
+    const dir = "./uploads";
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+    var file = formData[fileName]
+    uploadPath = dir + "/" + project + "." + file.name.split(".")[1];
+    file.mv(uploadPath, function (err) {
+      if (err) {
+        console.log("err:", err);
+        return res.status(500).send(err);
+      }
+    });
+    const newProject = new Project({
+      endTime: endTime,
+      projectName: project,
+      wlLimit: limit,
+      description: description,
+      listedWl: 0,
+      etherPrice: etherPrice,
+      clankPrice: clankPrice,
+      imageName: project+ "." + file.name.split(".")[1],
+    });
+    console.log(newProject);
+  
     await newProject.save();
     return res.json({ success: true, newProject: newProject });
   } catch (err) {
@@ -93,13 +143,30 @@ router.get("/project", async (req, res) => {
   }
 })
 
-router.delete("/delete/:projectName", async (req, res) => {
+router.get("/:projectName", async (req, res)=>{
+  const projectName = req.params.projectName;
   try{
-    const projectName = req.params.projectName;
+    Project.findOne({projectName: projectName}, (err, project)=>{
+      if (err) res.status(500).json({ success: false, error:"Server Error"})
+      res.json({success: true, project: project})
+    })
+  }catch (err) {
+    console.log("Error getting the details of the project with the name of " + projectName);
+    console.log(err);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+})
+router.delete("/delete/:projectName", async (req, res) => {
+  const projectName = req.params.projectName;
+  try{
+    const project = await Project.findOne({projectName: projectName})
     await Project.deleteOne({projectName: projectName} )
+    const dir = "./uploads";
+    const filePath = dir + "/" + project.imageName;
+    fs.unlinkSync(filePath);
     res.json({ success : true})
   }catch (err) {
-    console.log("Error getting an asset from user assets");
+    console.log("Error deleting in project with the name of " + projectName);
     console.log(err);
     res.status(500).json({ success: false, error: "Server error" });
   }

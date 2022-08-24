@@ -9,7 +9,7 @@ const projectSchema = new mongoose.Schema({
     clankPrice: {type:Number, required: true},
     imageName: {type:String, require:true},
     description: {type:String, required: true},
-    endTime: {type:Date}
+    endTime: {type:Date},
 })
 
 const Project = mongoose.model('Project', projectSchema);
