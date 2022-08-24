@@ -110,7 +110,7 @@ router.post("/insert", async (req, res) => {
       listedWl: 0,
       etherPrice: etherPrice,
       clankPrice: clankPrice,
-      imageName: project+ "." + file.name.split(".")[1],
+      imageName: project.replace(/ /g,"_")+ "." + file.name.split(".")[1],
     });
     console.log(newProject);
   
