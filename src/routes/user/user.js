@@ -96,6 +96,7 @@ router.post("/address/insertCart", async (req, res) => {
         orderNumber: lastNumber + 1,
       }
       orders.push(newOrder);
+      user.lastUpdate = new Date();
       console.log("Order:------",orders)
       user.save();
     }
@@ -125,15 +126,16 @@ router.post("/address/insertCart", async (req, res) => {
         walletAddress: address,
         discordID: discordID,
         orderDate: new Date(),
-        etherCost: etherCost,
-        clankCost: clankCost,
+        totalClank: etherCost,
+        totalEther: clankCost,
         whitelist: whitelist,
         orderNumber: lastNumber + 1,
       }
       const newUser = new User({
         user_id: userNum + 1,
         address: address,
-        orders: [newOrder]
+        orders: [newOrder],
+        lastUpdate: new Date()
       });
       newUser.save();
     }

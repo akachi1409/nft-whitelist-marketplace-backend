@@ -168,7 +168,7 @@ router.delete("/delete/:projectID", async (req, res) => {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: project.projectName.replace(/ /g,"_")
     }, (err, data) => {
-      console.error(err);
+      console.error("Error in removing", err);
       console.log(data);
     })
     await Project.deleteOne({_id: projectID} )
