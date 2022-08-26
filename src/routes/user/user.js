@@ -126,8 +126,8 @@ router.post("/address/insertCart", async (req, res) => {
         walletAddress: address,
         discordID: discordID,
         orderDate: new Date(),
-        totalClank: etherCost,
-        totalEther: clankCost,
+        totalClank: clankCost,
+        totalEther: etherCost,
         whitelist: whitelist,
         orderNumber: lastNumber + 1,
       }
