@@ -130,11 +130,15 @@ router.get("/project", async (req, res) => {
       if (err) {
         res.status(500).json({ success: false, error: "Server error" });
       }
-      users.map((user, index)=>{
-        user.orders.map((order) =>{
-          orders.push(order);
-        })
-      })
+      for (var i = 0 ; i< users.length; i++){
+        var orders1 = users[i].orders;
+        for (var j = 0 ; j<orders1.length; j ++){
+          
+          orders1[j].owner = users[i].address;
+          console.log("===", orders1[j].owner)
+          orders.push(orders1[j])
+        }
+      }
       res.json({ success : true, orders: orders})
     })
   } catch (err) {

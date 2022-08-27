@@ -57,6 +57,7 @@ router.get("/address/:address/:project", async (req, res) => {
   }
 });
 router.post("/address/insertCart", async (req, res) => {
+  const owner = req.body.owner;
   const address = req.body.address;
   const discordID = req.body.discordID;
   const cartInfo = req.body.cartInfo;
@@ -72,7 +73,7 @@ router.post("/address/insertCart", async (req, res) => {
     lastNumber =lastUser[0].orders[lastUser[0].orders.length-1].orderNumber
   }
   try{
-    const user = await User.findOne({ address: address });
+    const user = await User.findOne({ address: owner });
     if (user){
       const orders = user.orders;
       const whitelist = []
@@ -133,7 +134,7 @@ router.post("/address/insertCart", async (req, res) => {
       }
       const newUser = new User({
         user_id: userNum + 1,
-        address: address,
+        address: owner,
         orders: [newOrder],
         lastUpdate: new Date()
       });
@@ -146,6 +147,7 @@ router.post("/address/insertCart", async (req, res) => {
   }
 })
 router.post("/address/insert", async (req, res) => {
+  const owner = req.body.owner;
   const address = req.body.address;
   const project = req.body.project;
   const image = req.body.image;
@@ -165,7 +167,7 @@ router.post("/address/insert", async (req, res) => {
   }
   console.log("-------------")
   try {
-    const user = await User.findOne({ address: address });
+    const user = await User.findOne({ address: owner });
     if (user){
       const orders = user.orders;
       const newWL = {
@@ -209,7 +211,7 @@ router.post("/address/insert", async (req, res) => {
       }
       const newUser = new User({
         user_id: userNum + 1,
-        address: address,
+        address: owner,
         lastUpdate: new Date(),
         orders: [newOrder]
       });
