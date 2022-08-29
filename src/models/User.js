@@ -8,9 +8,8 @@ const whitelistHistory = new mongoose.Schema({
     clankCost: {type:Number, required: true},
 })
 const orderHistory = new mongoose.Schema({
-    owner: {type:String},
     walletAddress: {type:String, required: true},
-    discordID: {type:String, required: false},
+    discordID: {type:String, required: true},
     orderDate: {type:Date, required: true},
     totalEther: {type:Number, required: true},
     totalClank: {type:Number, required: true},
@@ -21,7 +20,6 @@ const userSchema = new mongoose.Schema({
     user_id: {type: Number, required: true},
     address: {type: String, required: true},
     lastUpdate: {type:Date, required: true},
-    
     orders: [orderHistory]
 })
 

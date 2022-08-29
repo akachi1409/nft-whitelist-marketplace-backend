@@ -133,10 +133,19 @@ router.get("/project", async (req, res) => {
       for (var i = 0 ; i< users.length; i++){
         var orders1 = users[i].orders;
         for (var j = 0 ; j<orders1.length; j ++){
-          
-          orders1[j].owner = users[i].address;
-          console.log("===", orders1[j].owner)
-          orders.push(orders1[j])
+          var order ={
+            walletAddress: orders1[j].walletAddress,
+            discordID: orders1[j].discordID,
+            orderDate: orders1[j].orderDate,
+            totalEther: orders1[j].totalEther,
+            totalClank: orders1[j].totalClank,
+            orderNumber: orders1[j].orderNumber,
+            whitelist: orders1[j].whitelist,
+            owner : users[i].address
+          } 
+          orders.push(order);
+          // orders1[j].owner = users[i].address;
+          // orders.push(orders1[j])
         }
       }
       res.json({ success : true, orders: orders})
