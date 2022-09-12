@@ -78,6 +78,12 @@ router.post("/address/insertCart", async (req, res) => {
       const orders = user.orders;
       const whitelist = []
       cartInfo.map(async (item, index)=> {
+        const wlProject =await Project.findOne({
+          projectName: item.projectName,
+        });
+        if (wlProject.listedWl + item.quantity > wlProject.wlLimit){
+          return res.status(500).json({success: false, error: "Not enough wl."})
+        }
         const newWL = {
           whitelistPicture: item.img,
           whitelistName: item.projectName,
@@ -86,9 +92,7 @@ router.post("/address/insertCart", async (req, res) => {
           clankCost: item.totalClank,
         }
         whitelist.push(newWL);
-        const wlProject =await Project.findOne({
-          projectName: item.projectName,
-        });
+        
         console.log(wlProject)
         if (wlProject) {
           wlProject.listedWl+= item.quantity;
@@ -114,6 +118,12 @@ router.post("/address/insertCart", async (req, res) => {
     else{
       const whitelist = []
       cartInfo.map(async (item, index)=> {
+        const wlProject =await Project.findOne({
+          projectName: item.projectName,
+        });
+        if (wlProject.listedWl + item.quantity > wlProject.wlLimit){
+          return res.status(500).json({success: false, error: "Not enough wl."})
+        }
         const newWL = {
           whitelistPicture: item.img,
           whitelistName: item.projectName,
@@ -122,9 +132,6 @@ router.post("/address/insertCart", async (req, res) => {
           clankCost: item.totalClank,
         }
         whitelist.push(newWL);
-        const wlProject =await Project.findOne({
-          projectName: item.projectName,
-        });
         console.log(wlProject)
         if (wlProject) {
           wlProject.listedWl+= item.quantity;
@@ -232,6 +239,9 @@ router.post("/address/insert", async (req, res) => {
       projectName: project,
     });
     console.log(wlProject)
+    if (wlProject.listedWl + quantity > wlProject.wlLimit){
+      return res.status(500).json({success: false, error: "Not enough wl."})
+    }
     if (wlProject) {
       wlProject.listedWl+= quantity;
       await wlProject.save();
