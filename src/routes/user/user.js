@@ -64,7 +64,8 @@ router.post("/address/insertCart", async (req, res) => {
   const etherCost = req.body.etherCost;
   const clankCost = req.body.clankCost;
   const userNum = await User.countDocuments();
-  console.log("---------------")
+  let usedClank = 0;
+  let usedEther = 0;
   let lastNumber;
   if (userNum == 0){
     lastNumber = 0;
@@ -81,39 +82,40 @@ router.post("/address/insertCart", async (req, res) => {
         const wlProject =await Project.findOne({
           projectName: item.projectName,
         });
-        if (wlProject.listedWl + item.quantity > wlProject.wlLimit){
-          return res.status(500).json({success: false, error: "Not enough wl."})
-        }
-        const newWL = {
-          whitelistPicture: item.img,
-          whitelistName: item.projectName,
-          quantity: item.quantity,
-          etherCost: item.totalEther,
-          clankCost: item.totalClank,
-        }
-        whitelist.push(newWL);
-        
-        console.log(wlProject)
-        if (wlProject) {
-          wlProject.listedWl+= item.quantity;
-          await wlProject.save();
-        } else {
-          res.status(500).json({ success: false, error: "Project not found." });
+        if (wlProject.listedWl + item.quantity <= wlProject.wlLimit){
+          const newWL = {
+            whitelistPicture: item.img,
+            whitelistName: item.projectName,
+            quantity: item.quantity,
+            etherCost: item.totalEther,
+            clankCost: item.totalClank,
+          }
+          usedEther += etherCost;
+          usedClank += clankCost;
+          whitelist.push(newWL);
+          if (wlProject) {
+            wlProject.listedWl+= item.quantity;
+            await wlProject.save();
+          } else {
+            res.status(500).json({ success: false, error: "Project not found." });
+          }
         }
       })
       const newOrder = {
         walletAddress: address,
         discordID: discordID,
         orderDate: new Date(),
-        totalEther: etherCost,
-        totalClank: clankCost,
+        // totalEther: etherCost,
+        // totalClank: clankCost,
+        totalEther: usedEther,
+        totalClank: usedClank,
         whitelist: whitelist,
         orderNumber: lastNumber + 1,
       }
       orders.push(newOrder);
       user.lastUpdate = new Date();
-      console.log("Order:------",orders)
       user.save();
+      return res.json({success: true, usedEther: usedEther, usedClank: usedClank})
     }
     else{
       const whitelist = []
@@ -121,31 +123,34 @@ router.post("/address/insertCart", async (req, res) => {
         const wlProject =await Project.findOne({
           projectName: item.projectName,
         });
-        if (wlProject.listedWl + item.quantity > wlProject.wlLimit){
-          return res.status(500).json({success: false, error: "Not enough wl."})
-        }
-        const newWL = {
-          whitelistPicture: item.img,
-          whitelistName: item.projectName,
-          quantity: item.quantity,
-          etherCost: item.totalEther,
-          clankCost: item.totalClank,
-        }
-        whitelist.push(newWL);
-        console.log(wlProject)
-        if (wlProject) {
-          wlProject.listedWl+= item.quantity;
-          await wlProject.save();
-        } else {
-          res.status(500).json({ success: false, error: "Project not found." });
+        if (wlProject.listedWl + item.quantity <= wlProject.wlLimit){
+          // return res.status(500).json({success: false, error: "Not enough wl."})
+          const newWL = {
+            whitelistPicture: item.img,
+            whitelistName: item.projectName,
+            quantity: item.quantity,
+            etherCost: item.totalEther,
+            clankCost: item.totalClank,
+          }
+          usedEther += etherCost;
+          usedClank += clankCost;
+          whitelist.push(newWL);
+          if (wlProject) {
+            wlProject.listedWl+= item.quantity;
+            await wlProject.save();
+          } else {
+            res.status(500).json({ success: false, error: "Project not found." });
+          }
         }
       })
       const newOrder = {
         walletAddress: address,
         discordID: discordID,
         orderDate: new Date(),
-        totalClank: clankCost,
-        totalEther: etherCost,
+        // totalClank: clankCost,
+        // totalEther: etherCost,
+        totalEther: usedEther,
+        totalClank: usedClank,
         whitelist: whitelist,
         orderNumber: lastNumber + 1,
       }
@@ -156,8 +161,8 @@ router.post("/address/insertCart", async (req, res) => {
         lastUpdate: new Date()
       });
       newUser.save();
+      return res.json({success: true, usedEther: usedEther, usedClank: usedClank})
     }
-
   } catch (err) {
     console.log(err);
     res.status(500).json({ success: false, error: "Server error" });
