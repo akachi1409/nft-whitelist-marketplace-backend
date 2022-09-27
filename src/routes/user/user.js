@@ -179,7 +179,6 @@ router.post("/address/insert", async (req, res) => {
   const clankCost = req.body.clankCost;
 
   const userNum = await User.countDocuments();
-  console.log("===========", userNum);
   let lastNumber;
   if (userNum == 0){
     lastNumber = 0;
@@ -187,73 +186,70 @@ router.post("/address/insert", async (req, res) => {
     const lastUser = await User.find().sort({lastUpdate: "asc"}).skip(userNum - 1);
     lastNumber =lastUser[0].orders[lastUser[0].orders.length-1].orderNumber
   }
-  console.log("-------------")
   try {
-    const user = await User.findOne({ address: owner });
-    if (user){
-      const orders = user.orders;
-      const newWL = {
-        whitelistPicture: image,
-        whitelistName: project,
-        quantity: quantity,
-        etherCost: etherCost,
-        clankCost: clankCost,
-      }
-      console.log(newWL)
-      const newOrder = {
-        walletAddress: address,
-        discordID: discordID,
-        orderDate: new Date(),
-        totalEther: etherCost,
-        totalClank: clankCost,
-        orderNumber: lastNumber + 1,
-        whitelist: [newWL]
-      }
-      console.log(newOrder)
-      user.lastUpdate = new Date();
-      orders.push(newOrder);
-      user.save();
-    }
-    else{
-      const newWL = {
-        whitelistPicture: image,
-        whitelistName: project,
-        quantity: quantity,
-        etherCost: etherCost,
-        clankCost: clankCost,
-      }
-      const newOrder = {
-        walletAddress: address,
-        discordID: discordID,
-        orderDate: new Date(),
-        totalEther: etherCost,
-        totalClank: clankCost,
-        orderNumber: lastNumber + 1,
-        whitelist: [newWL]
-      }
-      const newUser = new User({
-        user_id: userNum + 1,
-        address: owner,
-        lastUpdate: new Date(),
-        orders: [newOrder]
-      });
-      newUser.save();
-    }
-    
     const wlProject =await Project.findOne({
       projectName: project,
     });
-    console.log(wlProject)
-    if (wlProject.listedWl + quantity > wlProject.wlLimit){
-      return res.status(500).json({success: false, error: "Not enough wl."})
-    }
-    if (wlProject) {
-      wlProject.listedWl+= quantity;
+    if (wlProject.listedWl + quantity <= wlProject.wlLimit){
+      // return res.status(500).json({success: false, error: "Not enough wl."})
+      const user = await User.findOne({ address: owner });
+      if (user){
+        const orders = user.orders;
+        const newWL = {
+          whitelistPicture: image,
+          whitelistName: project,
+          quantity: quantity,
+          etherCost: etherCost,
+          clankCost: clankCost,
+        }
+        console.log(newWL)
+        const newOrder = {
+          walletAddress: address,
+          discordID: discordID,
+          orderDate: new Date(),
+          totalEther: etherCost,
+          totalClank: clankCost,
+          orderNumber: lastNumber + 1,
+          whitelist: [newWL]
+        }
+        console.log(newOrder)
+        user.lastUpdate = new Date();
+        orders.push(newOrder);
+        user.save();
+      }
+      else{
+        const newWL = {
+          whitelistPicture: image,
+          whitelistName: project,
+          quantity: quantity,
+          etherCost: etherCost,
+          clankCost: clankCost,
+        }
+        const newOrder = {
+          walletAddress: address,
+          discordID: discordID,
+          orderDate: new Date(),
+          totalEther: etherCost,
+          totalClank: clankCost,
+          orderNumber: lastNumber + 1,
+          whitelist: [newWL]
+        }
+        const newUser = new User({
+          user_id: userNum + 1,
+          address: owner,
+          lastUpdate: new Date(),
+          orders: [newOrder]
+        });
+        newUser.save();
+      }
+      // if (wlProject) {
+      wlProject.listedWl += quantity;
       await wlProject.save();
-    } else {
-      res.status(500).json({ success: false, error: "Project not found." });
+      // } else {
+      //   res.status(500).json({ success: false, error: "Project not found." });
+      // }
+      res.json({ success: true });
     }
-    res.json({ success: true });
   } catch (err) {
     console.log(err);
     res.status(500).json({ success: false, error: "Server error" });
