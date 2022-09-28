@@ -7,11 +7,11 @@ const path = require('path');
 const https = require('https');
 const fs = require('fs');
 
-const options = {
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem')
-};
-var server = https.createServer(options, app);
+// const options = {
+//   key: fs.readFileSync('key.pem'),
+//   cert: fs.readFileSync('cert.pem')
+// };
+// var server = https.createServer(options, app);
 // Constants
 const PUBLIC_DIR = path.join(__dirname, `../build/static`);
 const BUILD_DIR = path.join(__dirname, `../build`);
