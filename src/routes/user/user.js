@@ -112,6 +112,7 @@ router.post("/address/insertCart", async (req, res) => {
         whitelist: whitelist,
         orderNumber: lastNumber + 1,
       }
+      console.log("newOrder", newOrder);
       orders.push(newOrder);
       user.lastUpdate = new Date();
       user.save();
@@ -154,6 +155,7 @@ router.post("/address/insertCart", async (req, res) => {
         whitelist: whitelist,
         orderNumber: lastNumber + 1,
       }
+      console.log("newOrder", newOrder);
       const newUser = new User({
         user_id: userNum + 1,
         address: owner,
