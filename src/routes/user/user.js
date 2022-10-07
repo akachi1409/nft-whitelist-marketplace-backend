@@ -56,6 +56,15 @@ router.get("/address/:address/:project", async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 });
+
+const saveProject = (wlProject) =>{
+  return new Promise(resolve => {
+    wlProject.save(resolve);
+  })
+}
+const saveFunc = (wlProject) =>{
+  return saveProject(wlProject);
+}
 router.post("/address/insertCart", async (req, res) => {
   const owner = req.body.owner;
   const address = req.body.address;
@@ -78,7 +87,10 @@ router.post("/address/insertCart", async (req, res) => {
     if (user){
       const orders = user.orders;
       const whitelist = []
-      cartInfo.map(async (item, index)=> {
+      // cartInfo.map(async (item, index)=> {
+      for (var i = 0 ; i< cartInfo.length ; i++){
+        const item = cartInfo[i];
+        console.log("item", item);
         const wlProject =await Project.findOne({
           projectName: item.projectName,
         });
@@ -90,17 +102,20 @@ router.post("/address/insertCart", async (req, res) => {
             etherCost: item.totalEther,
             clankCost: item.totalClank,
           }
-          usedEther += etherCost;
-          usedClank += clankCost;
+          console.log("newWL", newWL);
+          usedEther += Number(item.totalEther);
+          usedClank += Number(item.totalClank);
+          console.log("usedClank", usedClank)
           whitelist.push(newWL);
           if (wlProject) {
             wlProject.listedWl+= item.quantity;
-            await wlProject.save();
+            await saveFunc(wlProject);
+            // await wlProject.save();
           } else {
             res.status(500).json({ success: false, error: "Project not found." });
           }
         }
-      })
+      }
       const newOrder = {
         walletAddress: address,
         discordID: discordID,
@@ -120,7 +135,9 @@ router.post("/address/insertCart", async (req, res) => {
     }
     else{
       const whitelist = []
-      cartInfo.map(async (item, index)=> {
+      // cartInfo.map(async (item, index)=> {
+      for (var i = 0; i < item.cartInfo.length; i++) {
+        const item = item.cartInfo[i]
         const wlProject =await Project.findOne({
           projectName: item.projectName,
         });
@@ -138,12 +155,13 @@ router.post("/address/insertCart", async (req, res) => {
           whitelist.push(newWL);
           if (wlProject) {
             wlProject.listedWl+= item.quantity;
-            await wlProject.save();
+            // await wlProject.save();
+            await saveFunc(wlProject);
           } else {
             res.status(500).json({ success: false, error: "Project not found." });
           }
         }
-      })
+      }
       const newOrder = {
         walletAddress: address,
         discordID: discordID,
